@@ -1,9 +1,11 @@
 <script setup>
 import MagnifyingGlass from '@/Components/Icons/MagnifyingGlass.vue';
+import Pagination from '@/Components/Pagination.vue';
 
 defineProps({
     students: {
         type: Object,
+        required: true,
     },
 });
 </script>
@@ -161,7 +163,7 @@ defineProps({
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="mt-5">Links</div>
+                            <Pagination :data="students"></Pagination>
                         </div>
                     </div>
                 </div>
