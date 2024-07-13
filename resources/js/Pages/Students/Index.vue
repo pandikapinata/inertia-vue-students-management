@@ -1,15 +1,45 @@
 <script setup>
-import MagnifyingGlass from '@/Components/Icons/MagnifyingGlass.vue';
-import Pagination from '@/Components/Pagination.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
+import Pagination from "@/Components/Pagination.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
+import { ref, watch, computed } from "vue";
 
 defineProps({
   students: {
     type: Object,
-    required: true,
   },
 });
+
+let pageNumber = ref(1),
+  searchTerm = ref(usePage().props.search ?? "");
+
+const pageNumberUpdated = (link) => {
+  pageNumber.value = link.url.split("=")[1];
+};
+
+let studentsUrl = computed(() => {
+  const url = new URL(route("students.index"));
+
+  url.searchParams.set("page", pageNumber.value);
+
+  if (searchTerm.value) {
+    url.searchParams.set("search", searchTerm.value);
+  }
+
+  return url;
+});
+
+watch(
+  () => studentsUrl.value,
+  (newValue) => {
+    router.visit(newValue, {
+      replace: true,
+      preserveState: true,
+      preserveScroll: true,
+    });
+  }
+);
 
 const deleteForm = useForm({});
 
@@ -59,7 +89,7 @@ const deleteStudent = (id) => {
                 <MagnifyingGlass />
               </div>
 
-              <input type="text" placeholder="Search students data..." id="search"
+              <input type="text" v-model="searchTerm" placeholder="Search students data..." id="search"
                 class="block py-2 pl-10 text-gray-900 border-0 rounded-lg ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
           </div>
@@ -110,12 +140,17 @@ const deleteStudent = (id) => {
                           {{ student.section.name }}
                         </td>
                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                          {{ student.created_at }}
+                          {{
+                            student.created_at
+                          }}
                         </td>
 
                         <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
-                          <Link :href="route('students.edit', student.id)"
-                            class="text-indigo-600 hover:text-indigo-900">
+                          <Link :href="route(
+                            'students.edit',
+                            student.id
+                          )
+                            " class="text-indigo-600 hover:text-indigo-900">
                           Edit
                           </Link>
                           <button @click="
@@ -130,7 +165,7 @@ const deleteStudent = (id) => {
                     </tbody>
                   </table>
                 </div>
-                <Pagination :data="students"></Pagination>
+                <Pagination :data="students" :pageNumberUpdated="pageNumberUpdated" />
               </div>
             </div>
           </div>

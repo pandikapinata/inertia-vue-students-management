@@ -5,10 +5,13 @@ defineProps({
     data: {
         type: Object,
     },
+    pageNumberUpdated: {
+        type: Function,
+        required: true,
+    },
 });
 
 const updatePageNumber = (link) => {
-    console.log(link.url);
     let pageNumber = link.url.split("=")[1];
 
     router.visit(`/students?&page=${pageNumber}`, {
@@ -57,9 +60,9 @@ const updatePageNumber = (link) => {
                                 aria-label="Pagination"
                             >
                                 <button
-                                    v-for="link in data.meta.links"
-                                    :key="link.url"
-                                    @click.prevent="updatePageNumber(link)"
+                                    v-for="(link, index) in data.meta.links"
+                                    :key="index"
+                                     @click.prevent="pageNumberUpdated(link)"
                                     :disabled="link.active || !link.url"
                                     class="relative inline-flex items-center px-4 py-2 text-sm font-medium border"
                                     :class="{
