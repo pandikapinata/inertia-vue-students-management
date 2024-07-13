@@ -18,7 +18,9 @@ class StudentResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'class' => KelasResource::make($this->whenLoaded('kelas')), // 'class' is a reserved keyword in PHP
+            'kelas_id' => $this->kelas_id,
+            'section_id' => $this->section_id,
+            'kelas' => KelasResource::make($this->whenLoaded('kelas')), // 'class' is a reserved keyword in PHP
             'section' => SectionResource::make($this->whenLoaded('section')),
             'created_at' => $this->created_at->toFormattedDateString(),
         ];
