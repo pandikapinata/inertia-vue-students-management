@@ -1,23 +1,12 @@
 <script setup>
-import { router } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 
 defineProps({
     data: {
         type: Object,
-    },
-    pageNumberUpdated: {
-        type: Function,
-        required: true,
-    },
+    }
 });
 
-const updatePageNumber = (link) => {
-    let pageNumber = link.url.split("=")[1];
-
-    router.visit(`/students?&page=${pageNumber}`, {
-        preserveScroll: true,
-    });
-};
 </script>
 
 <template>
@@ -59,21 +48,20 @@ const updatePageNumber = (link) => {
                                 class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
                                 aria-label="Pagination"
                             >
-                                <button
+                                <component
                                     v-for="(link, index) in data.meta.links"
                                     :key="index"
-                                     @click.prevent="pageNumberUpdated(link)"
-                                    :disabled="link.active || !link.url"
-                                    class="relative inline-flex items-center px-4 py-2 text-sm font-medium border"
+                                    :is="link.url ? Link : 'span'"
+                                    :href="link.url"
+                                     v-html="link.label"
+                                     class="relative inline-flex items-center px-4 py-2 text-sm font-medium border"
                                     :class="{
                                         'z-10 bg-indigo-50 border-indigo-500 text-indigo-600':
                                             link.active,
                                         'bg-white border-gray-300 text-gray-500 hover:bg-gray-50':
                                             !link.active,
                                     }"
-                                >
-                                    <span v-html="link.label"></span>
-                                </button>
+                                />
                             </nav>
                         </div>
                     </div>

@@ -13,17 +13,19 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $studentQuery = Student::query();
 
-        $studentQuery = $this->applySearch($studentQuery, request('search'));
+        $studentQuery = $this->applySearch($studentQuery, $request->input('search'));
 
         return inertia('Students/Index', [
             'students' => StudentResource::collection(
-                $studentQuery->paginate(5)
+                $studentQuery
+                ->paginate(5)
+                ->withQueryString() // to keep the query string on pagination
             ),
-            'search' => request('search') ?? ''
+            'filters' => $request->only(['search']),
         ]);
     }
 

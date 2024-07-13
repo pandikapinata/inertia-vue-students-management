@@ -2,44 +2,29 @@
 import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
 import Pagination from "@/Components/Pagination.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
-import { ref, watch, computed } from "vue";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { ref, watch } from "vue";
+import debounce from "lodash.debounce";
 
-defineProps({
+const props = defineProps({
   students: {
     type: Object,
   },
-});
-
-let pageNumber = ref(1),
-  searchTerm = ref(usePage().props.search ?? "");
-
-const pageNumberUpdated = (link) => {
-  pageNumber.value = link.url.split("=")[1];
-};
-
-let studentsUrl = computed(() => {
-  const url = new URL(route("students.index"));
-
-  url.searchParams.set("page", pageNumber.value);
-
-  if (searchTerm.value) {
-    url.searchParams.set("search", searchTerm.value);
+  filters: {
+    type: Object,
   }
-
-  return url;
 });
 
-watch(
-  () => studentsUrl.value,
-  (newValue) => {
-    router.visit(newValue, {
-      replace: true,
-      preserveState: true,
-      preserveScroll: true,
+const searchTerm = ref(props.filters.search || "");
+
+// Watch for changes in the search term and update the URL query string
+watch(searchTerm, debounce((value) => {
+    router.visit(route("students.index", { search: value }), {
+        replace: true,
+        preserveState: true,
+        preserveScroll: true,
     });
-  }
-);
+}, 500));
 
 const deleteForm = useForm({});
 
@@ -165,7 +150,7 @@ const deleteStudent = (id) => {
                     </tbody>
                   </table>
                 </div>
-                <Pagination :data="students" :pageNumberUpdated="pageNumberUpdated" />
+                <Pagination :data="students" />
               </div>
             </div>
           </div>
